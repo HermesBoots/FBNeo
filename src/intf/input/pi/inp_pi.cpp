@@ -8,7 +8,7 @@
 
 // Note that these constants are tied to the JOY_ macros!
 #define MAX_JOYSTICKS   8
-#define MAX_JOY_BUTTONS 28
+#define MAX_JOY_BUTTONS 25
 
 #define FREEPLAY_HACK_COIN_DURATION_MS 1e3 / 8
 
@@ -19,8 +19,8 @@ int nEnableFreeplayHack = 0;
 static struct timeval lastInputEvent;
 static uint64_t startPressUsec[4];
 
-static unsigned int joyButtonStates[MAX_JOYSTICKS];
-static int *joyLookupTable = NULL;
+static UINT32 joyButtonStates[MAX_JOYSTICKS];
+static UINT32 *joyLookupTable = NULL;
 static int keyLookupTable[512];
 
 static int mouseScanned = 0;
@@ -40,10 +40,10 @@ static int handleFreeplayHack(int player, int code);
 #define JOY_DIR_UP    0x02
 #define JOY_DIR_DOWN  0x03
 
-#define JOY_MAP_DIR(joy,dir) ((((joy)&0xff)<<8)|((dir)&0x3))
-#define JOY_MAP_BUTTON(joy,button) ((((joy)&0xff)<<8)|(((button)+4)&0x1f))
-#define JOY_IS_DOWN(value) (joyButtonStates[((value)>>8)&0x7]&(1<<((value)&0xff)))
-#define JOY_CLEAR(value) joyButtonStates[((value)>>8)&0x7]&=~(1<<((value)&0xff))
+#define JOY_MAP_DIR(joy,dir) (((joy)&0x7)<<29 | 1<<(dir)&0xf)
+#define JOY_MAP_BUTTON(joy,button) (((joy)&0x7)<<29 | (button)<<4&0x1ffffff0)
+#define JOY_IS_DOWN(value) (joyButtonStates[(value)>>29&0x7] & (1<<(value)&0x1ffffff))
+#define JOY_CLEAR(value) joyButtonStates[(value)>>29&0x7] &= ~(1<<(value)&0x1ffffff)
 #define KEY_IS_DOWN(key) keyState[(key)]
 
 #define JOY_DEADZONE 0x4000
@@ -97,7 +97,7 @@ static int piInputInit()
 	piInputExit();
 
 	// Allocate memory for the lookup table
-	if ((joyLookupTable = (int *)malloc(0x8000 * sizeof(int))) == NULL) {
+	if ((joyLookupTable = malloc(0x8000 * sizeof(*joyLookupTable))) == NULL) {
 		return 1;
 	}
 
