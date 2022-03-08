@@ -42,8 +42,8 @@ static int handleFreeplayHack(int player, int code);
 
 #define JOY_MAP_DIR(joy,dir) (((joy)&0x7)<<29 | 1<<(dir)&0xf)
 #define JOY_MAP_BUTTON(joy,button) (((joy)&0x7)<<29 | (button)<<4&0x1ffffff0)
-#define JOY_IS_DOWN(value) (joyButtonStates[(value)>>29&0x7] & (1<<(value)&0x1ffffff))
-#define JOY_CLEAR(value) joyButtonStates[(value)>>29&0x7] &= ~(1<<(value)&0x1ffffff)
+#define JOY_IS_DOWN(value) (joyButtonStates[(value)>>29&0x7] & ((value)&0x1ffffff))
+#define JOY_CLEAR(value) joyButtonStates[(value)>>29&0x7] &= ~((value)&0x1ffffff)
 #define KEY_IS_DOWN(key) keyState[(key)]
 
 #define JOY_DEADZONE 0x4000
