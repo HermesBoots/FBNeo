@@ -280,13 +280,14 @@ static void scanJoysticks()
 
 		int xPos = SDL_JoystickGetAxis(joystick, 0);
 		int yPos = SDL_JoystickGetAxis(joystick, 1);
+		UINT8 padDir = SDL_JoystickGetHat(joystick, 0);
 
 		// Directions
 		int dirStates[] = {
-			(xPos < -JOY_DEADZONE), // left
-			(xPos > JOY_DEADZONE),  // right
-			(yPos < -JOY_DEADZONE), // up
-			(yPos > JOY_DEADZONE),  // down
+			(xPos < -JOY_DEADZONE) || padDir & SDL_HAT_LEFT,
+			(xPos > JOY_DEADZONE) || padDir & SDL_HAT_RIGHT,
+			(yPos < -JOY_DEADZONE) || padDir & SDL_HAT_UP,
+			(yPos > JOY_DEADZONE), || padDir & SDL_HAT_DOWN
 		};
 		for (int i = 0; i < 4; i++) {
 			joyButtonStates[joy] |= (dirStates[i] << i);
