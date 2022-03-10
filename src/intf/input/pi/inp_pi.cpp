@@ -112,6 +112,9 @@ static int piInputInit()
 
 	// Set up the joysticks
 	nJoystickCount = SDL_NumJoysticks();
+	if (nJoystickCount > MAX_JOYSTICKS) {
+		nJoystickCount = MAX_JOYSTICKS;
+	}
 	for (int i = 0; i < nJoystickCount; i++) {
 		JoyList[i] = SDL_JoystickOpen(i);
 	}
@@ -266,15 +269,10 @@ static void scanJoysticks()
 {
 	SDL_JoystickUpdate();
 
-	int joyCount = nJoystickCount;
-	if (joyCount > MAX_JOYSTICKS) {
-		joyCount = MAX_JOYSTICKS;
-	}
-
 #ifdef DEBUG_INPUT
 	static unsigned int oldButtonStates[MAX_JOYSTICKS];
 #endif
-	for (int joy = 0; joy < joyCount; joy++) {
+	for (int joy = 0; joy < nJoystickCount; joy++) {
 		joyButtonStates[joy] = 0;
 		SDL_Joystick *joystick = JoyList[joy];
 
